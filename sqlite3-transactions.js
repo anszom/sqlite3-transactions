@@ -89,9 +89,11 @@ module.exports.TransactionDatabase = TransactionDatabase;
 
 function wrapObject(transactionDatabase, target, source) {
 	// wrap all methods
-	for (var method in source) {
-		if (_.isFunction(source[method]) && _.indexOf(prohibitedMethods, method)<0)
-			target[method] = wrapDbMethod(transactionDatabase, source, method);
+	for(var proto = source; proto; proto = Object.getPrototypeOf(proto)) {
+		Object.getOwnPropertyNames(proto).forEach(function(method) {
+			if (_.isFunction(source[method]) && _.indexOf(prohibitedMethods, method)<0)
+				target[method] = wrapDbMethod(transactionDatabase, source, method);
+		})
 	}
 
 	// setup events
